@@ -1,0 +1,28 @@
+.container {
+  margin: 0 auto;
+  padding: 0 25px;
+}
+
+.center {
+  text-align: center;
+}
+
+.title {
+  font-size: 44pt;
+  font-weight: bold;
+}
+
+.main-button {
+  font-size: 1.5em;
+}
+
+/* sign up */
+/* ripped straight from picniccss */
+.signup .row {
+  margin-bottom: 2em;
+}
+
+.signup input {
+  display: block;
+  margin: .6em auto;
+}
