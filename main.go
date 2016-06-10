@@ -6,7 +6,11 @@ import (
 	"net/http"
 	"os"
 	"path"
+
+	"github.com/cschep/trix"
 )
+
+var t *trix.Trix
 
 func serveTemplate(w http.ResponseWriter, r *http.Request) {
 	lp := path.Join("templates", "layout.html")
@@ -52,10 +56,28 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 }
 
 func answerHandler(w http.ResponseWriter, r *http.Request) {
-	// renderTemplate(w, "main", nil)
-	log.Println("ANSWERED", r.URL.Path)
+	if r.Method == "POST" {
+		r.ParseForm()
 
-	http.Redirect(w, r, "/thanks", 302)
+		response := ""
+		if r.URL.Path == "/answer/sadlyno" {
+			response = "NO"
+		} else {
+			response = "YES"
+		}
+
+		// logic part of log in
+		who := r.Form.Get("who")
+		note := r.Form.Get("note")
+
+		var values [][]interface{}
+		values = append(values, []interface{}{who, note, response})
+		t.InsertRow(values)
+
+		http.Redirect(w, r, "/thanks", 302)
+	} else {
+		http.Redirect(w, r, "/", 302)
+	}
 }
 
 func loggerMiddleware(handler http.Handler) http.Handler {
@@ -67,6 +89,12 @@ func loggerMiddleware(handler http.Handler) http.Handler {
 
 func main() {
 	log.Println("SCHEPMAN WEDDING ONLINE")
+
+	var err error
+	t, err = trix.NewTrix("1F24Fv_JQcUepcEWcPF2BDpESl1HfTbmDRyDE0m02wvI")
+	if err != nil {
+		log.Fatalf("failed to create connection to google spreadsheets.")
+	}
 
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
