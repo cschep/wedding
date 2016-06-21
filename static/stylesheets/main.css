@@ -1,6 +1,41 @@
+body {
+  background-image:
+  linear-gradient(
+    rgba(0, 0, 0, 0.7),
+    rgba(0, 0, 0, 0.7)
+  ),
+  url('/static/img/save_the_date.jpg');
+
+  /*background-repeat: repeat-y;*/
+  background-size: cover;
+
+  color: white;
+}
+
+input, select {
+  font-size: 1.5em;
+  color: #333;
+  display: block;
+  margin: .6em auto;
+}
+
+input[type=submit] {
+  color: #fff;
+}
+
+textarea {
+  color: #333;
+}
+
+p {
+  font-size: 1.2em;
+}
+
 .container {
   margin: 0 auto;
-  padding: 0 25px;
+  padding: 100px 100px;
+
+  /*height: 100vh;*/
 }
 
 .center {
@@ -10,19 +45,4 @@
 .title {
   font-size: 44pt;
   font-weight: bold;
-}
-
-.main-button {
-  font-size: 1.5em;
-}
-
-/* sign up */
-/* ripped straight from picniccss */
-.signup .row {
-  margin-bottom: 2em;
-}
-
-.signup input {
-  display: block;
-  margin: .6em auto;
 }

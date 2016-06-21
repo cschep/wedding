@@ -1,20 +1,26 @@
 {{define "body"}}
   <div class="grid one">
     <div class="title center">WE ARE GETTING MARRIED!</div>
-    <div class="title center">can you come???!</div>
+    <div class="title center">Who are you? Can you come?!</div>
   </div>
 
-  <div class="grid two">
-    <div class="center">
-      <a href="/no" class="button main-button error">AGONY!! - SADLY, I CANNOT</a>
+  <form method="POST">
+    <div class="grid one">
+        <input name="last_name" placeholder="What is your Last Name?">
     </div>
 
-    <div class="center">
-      <a href="/yes" class="button main-button success">YES! A THOUSAND TIMES YES!</a>
-    </div>
-  </div>
+    <div class="grid two">
+      <div class="center">
+        <input type="submit" formaction="/no" class="button main-button error" value="AGONY!! - SADLY, I CANNOT"></input>
+      </div>
 
-  <div class="grid one">
+      <div class="center">
+        <input type="submit" formaction="/yes" class="button main-button success" value="YES! A THOUSAND TIMES YES!"></input>
+      </div>
+    </div>
+  </form>
+
+  <!-- <div class="grid one">
     <img src="/static/img/save_the_date.jpg" alt="" />
-  </div>
+  </div> -->
 {{end}}

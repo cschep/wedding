@@ -1,3 +1,4 @@
 .credentials
 tmp
 client_secret.json
+invite_list.json

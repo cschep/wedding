@@ -1,0 +1,20 @@
+{{define "body"}}
+  <div class="grid one">
+    <div class="title center">Sweet!</div>
+  </div>
+
+  <div class="grid one center">
+    <p>Ok this is going to be so awesome.</p>
+    <p>Let us know the details so we can prepare everything just so.</p>
+  </div>
+
+  <div class="grid one">
+    <form method="POST" class="signup" action="/answer/yes">
+      <input name="who" placeholder="Family name / Party name / Who are you?">
+      <textarea name="note" rows="7" placeholder="If you'd like to get anything off of your chest.. do it here!"></textarea>
+      <div class="center">
+        <input type="submit" class="button success main-button" value="LET'S DO THIS. 😍"></input>
+      </div>
+    </form>
+  </div>
+{{end}}

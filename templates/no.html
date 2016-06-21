@@ -1,20 +1,28 @@
 {{define "body"}}
   <div class="grid one">
-    <div class="title center">Oh Noooooooooo!!</div>
+    <div class="title center">OH NO!</div>
   </div>
 
   <div class="grid one center">
     <p>We're sad that you can't come, but we totally understand!</p>
-    <p>Let us know who you are so we can grieve properly? Thanks so much.</p>
+    <p>Let us know who you are so we can grieve properly?</p>
+    <p>Thanks so much. 😊</p>
   </div>
 
   <div class="grid one">
-    <form method="POST" class="signup" action="/answer/sadlyno">
-      <div>
-        <input name="who" placeholder="Family name / Party name / Who are you?">
+    <form method="POST" action="/answer/no">
+        <!-- <input name="who" placeholder="Family name / Party name / Who are you?"> -->
+        <select name="who">
+          <option>Which {{.LastName}} specifically?</option>
+          {{range .FilteredList}}
+            <option value="{{.}}">{{.}}</option>
+          {{end}}
+        </select>
+
         <textarea name="note" rows="7" placeholder="If you'd like to get anything off of your chest.. do it here!"></textarea>
-        <input type="submit" class="button main-button" value="I guess that's it. 😢😭"></input>
-      </div>
+        <div class="center">
+          <input type="submit" class="button main-button" value="I guess that's it. 😢😭"></input>
+        </div>
     </form>
   </div>
 {{end}}
