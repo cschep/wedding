@@ -2,6 +2,7 @@ package data
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -85,16 +86,68 @@ func readInviteList() ([]string, error) {
 // 	return []string{"James Pozdena", "Ruffenach Family"}
 // }
 
+//TODO: refactor, these are basically the same
+
 //RespondNo submits the data as a NO response
-func (wd *WeddingData) RespondNo(who string, note string) {
+func (wd *WeddingData) RespondNo(who string, note string) error {
+	// var values [][]interface{}
+	// values = append(values, []interface{}{who, note, "NO"})
+	// wd.t.InsertRow("RSVP", values)
+
+	readResp, err := wd.t.Get("RSVP!J:J")
+	if err != nil || len(readResp.Values) < 1 {
+		log.Println("No Values.", err)
+		return err
+	}
+
+	var writeRow int
+	for i, row := range readResp.Values {
+		if row[0] == who {
+			writeRow = i + 1 //the spreadsheet has a
+		}
+	}
+
+	updateRange := fmt.Sprintf("RSVP!K%d:Q%d", writeRow, writeRow)
+
 	var values [][]interface{}
-	values = append(values, []interface{}{who, note, "NO"})
-	wd.t.InsertRow("RSVP", values)
+	values = append(values, []interface{}{note, "NO"})
+	_, err = wd.t.Update(updateRange, values)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
 }
 
-//RespondYes submits the data as a NO response
-func (wd *WeddingData) RespondYes(who string, note string) {
+//RespondYes submits the data as a YES response
+func (wd *WeddingData) RespondYes(who string, note string) error {
+	// var values [][]interface{}
+	// values = append(values, []interface{}{who, note, "NO"})
+	// wd.t.InsertRow("RSVP", values)
+
+	readResp, err := wd.t.Get("RSVP!J:J")
+	if err != nil || len(readResp.Values) < 1 {
+		log.Println("No Values.", err)
+		return err
+	}
+
+	var writeRow int
+	for i, row := range readResp.Values {
+		if row[0] == who {
+			writeRow = i + 1 //the spreadsheet has a
+		}
+	}
+
+	updateRange := fmt.Sprintf("RSVP!K%d:Q%d", writeRow, writeRow)
+
 	var values [][]interface{}
-	values = append(values, []interface{}{who, note, "YES"})
-	wd.t.InsertRow("RSVP", values)
+	values = append(values, []interface{}{note, "YES"})
+	_, err = wd.t.Update(updateRange, values)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
 }

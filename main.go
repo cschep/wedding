@@ -46,7 +46,7 @@ func makeAnswerHandler(wd *data.WeddingData) func(w http.ResponseWriter, r *http
 			note := r.Form.Get("note")
 
 			if response == "YES" {
-				log.Println("RESPONDING YES")
+				wd.RespondYes(who, note)
 			} else if response == "NO" {
 				wd.RespondNo(who, note)
 			}
