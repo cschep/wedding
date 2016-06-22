@@ -2,3 +2,5 @@
 tmp
 client_secret.json
 invite_list.json
+wedding
+deploy.sh
