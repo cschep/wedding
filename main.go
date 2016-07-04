@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 	"strings"
@@ -34,21 +35,18 @@ func makeAnswerHandler(wd *data.WeddingData) func(w http.ResponseWriter, r *http
 		if r.Method == "POST" {
 			r.ParseForm()
 
-			response := ""
-			if r.URL.Path == "/answer/no" {
-				response = "NO"
-			} else if r.URL.Path == "/answer/yes" {
-				response = "YES"
-			}
-
 			// logic part of log in
 			who := r.Form.Get("who")
+			karaoke := r.Form.Get("karaoke")
 			note := r.Form.Get("note")
 
-			if response == "YES" {
-				wd.RespondYes(who, note)
-			} else if response == "NO" {
+			if r.URL.Path == "/answer/no" {
 				wd.RespondNo(who, note)
+			} else if r.URL.Path == "/answer/yes" {
+				wd.RespondYes(who, note)
+				if karaoke == "YES" {
+					http.Redirect(w, r, "/karaoke", 302)
+				}
 			}
 
 			http.Redirect(w, r, "/thanks", 302)
@@ -68,16 +66,19 @@ func makeInviteListHandler(wd *data.WeddingData, templateName string) func(w htt
 			log.Println("filtering by", lastName)
 
 			var filteredList []string
+			karaoke := "NO"
 			for _, invite := range wd.InviteList {
-				include := strings.Contains(invite, lastName)
+				include := strings.Contains(invite["invite"], lastName)
 				if include {
-					filteredList = append(filteredList, invite)
+					filteredList = append(filteredList, invite["invite"])
+					karaoke = invite["karaoke"]
 				}
 			}
 
 			data := make(map[string]interface{})
 			data["FilteredList"] = filteredList
 			data["LastName"] = lastName
+			data["Karaoke"] = karaoke
 
 			//filter invite list and render template
 			views.RenderTemplate(w, templateName, data)
@@ -95,7 +96,12 @@ func loggerMiddleware(handler http.Handler) http.Handler {
 }
 
 func main() {
-	log.Println("SCHEPMAN WEDDING ONLINE")
+	//flags
+	portPtr := flag.String("port", ":2222", "Which port to listen on.")
+	flag.Parse()
+
+	//init status
+	log.Println("SCHEPMAN WEDDING ONLINE -", *portPtr)
 
 	//init views with template directory
 	views.Init("templates")
@@ -114,5 +120,5 @@ func main() {
 	http.HandleFunc("/yes", makeInviteListHandler(wd, "yes.html"))
 	http.HandleFunc("/answer/", makeAnswerHandler(wd))
 
-	http.ListenAndServe(":2222", loggerMiddleware(http.DefaultServeMux))
+	http.ListenAndServe(*portPtr, loggerMiddleware(http.DefaultServeMux))
 }

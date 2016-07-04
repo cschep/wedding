@@ -12,7 +12,7 @@ import (
 //WeddingData holds all the data associated with a wedding
 type WeddingData struct {
 	t          *trix.Trix
-	InviteList []string
+	InviteList []map[string]string
 }
 
 //NewWeddingData makes a new WeddingData struct with a trix object initialized
@@ -27,13 +27,16 @@ func NewWeddingData(spreadsheetID string) (*WeddingData, error) {
 	inviteList, err := readInviteList()
 	if err != nil {
 		log.Println("retrieving inviteList from google")
-		invites, err := t.Get("RSVP!J:J")
+		invites, err := t.Get("RSVP!J:K")
 		if err != nil {
 			return nil, err
 		}
 
 		for _, invite := range invites.Values {
-			inviteList = append(inviteList, invite[0].(string))
+			inviteMap := make(map[string]string)
+			inviteMap["invite"] = invite[0].(string)
+			inviteMap["karaoke"] = invite[1].(string)
+			inviteList = append(inviteList, inviteMap)
 		}
 
 		err = saveInviteList(inviteList)
@@ -52,7 +55,7 @@ func NewWeddingData(spreadsheetID string) (*WeddingData, error) {
 	return wd, nil
 }
 
-func saveInviteList(list []string) error {
+func saveInviteList(list []map[string]string) error {
 	b, err := json.Marshal(list)
 	if err != nil {
 		return err
@@ -66,13 +69,13 @@ func saveInviteList(list []string) error {
 	return nil
 }
 
-func readInviteList() ([]string, error) {
+func readInviteList() ([]map[string]string, error) {
 	b, err := ioutil.ReadFile("invite_list.json")
 	if err != nil {
 		return nil, err
 	}
 
-	var inviteList []string
+	var inviteList []map[string]string
 	err = json.Unmarshal(b, &inviteList)
 	if err != nil {
 		return nil, err
@@ -126,7 +129,7 @@ func (wd *WeddingData) RespondYes(who string, note string) error {
 	// values = append(values, []interface{}{who, note, "NO"})
 	// wd.t.InsertRow("RSVP", values)
 
-	readResp, err := wd.t.Get("RSVP!J:J")
+	readResp, err := wd.t.Get("RSVP!J:K")
 	if err != nil || len(readResp.Values) < 1 {
 		log.Println("No Values.", err)
 		return err
@@ -139,7 +142,7 @@ func (wd *WeddingData) RespondYes(who string, note string) error {
 		}
 	}
 
-	updateRange := fmt.Sprintf("RSVP!K%d:Q%d", writeRow, writeRow)
+	updateRange := fmt.Sprintf("RSVP!L%d:Q%d", writeRow, writeRow)
 
 	var values [][]interface{}
 	values = append(values, []interface{}{note, "YES"})

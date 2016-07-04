@@ -4,10 +4,12 @@ body {
     rgba(0, 0, 0, 0.7),
     rgba(0, 0, 0, 0.7)
   ),
-  url('/static/img/save_the_date.jpg');
+  url('/static/img/invite_mock_closed.png');
 
-  /*background-repeat: repeat-y;*/
+  /*background-repeat: no-repeat;*/
   background-size: cover;
+
+  font-family: 'Roboto Mono';
 
   color: white;
 }
@@ -44,5 +46,5 @@ p {
 
 .title {
   font-size: 44pt;
-  font-weight: bold;
+  /*font-weight: bold;*/
 }
