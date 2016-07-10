@@ -10,6 +10,13 @@
       Looks like you've been hand picked for a secret mission.
 
       How will you respond?
+
+      <select name="song">
+        <option>Which song will you sing?!</option>
+        {{range .Songs}}
+          <option value="{{.}}">{{.}}</option>
+        {{end}}
+      </select>
     </p>
   </div>
 </div>

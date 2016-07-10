@@ -37,13 +37,20 @@ func makeAnswerHandler(wd *data.WeddingData) func(w http.ResponseWriter, r *http
 
 			// logic part of log in
 			who := r.Form.Get("who")
-			karaoke := r.Form.Get("karaoke")
 			note := r.Form.Get("note")
 
+			whoParts := strings.Split(who, ":")
+			name := whoParts[0]
+
+			karaoke := "NO"
+			if len(whoParts) > 1 {
+				karaoke = whoParts[1]
+			}
+
 			if r.URL.Path == "/answer/no" {
-				wd.RespondNo(who, note)
+				wd.RespondNo(name, note)
 			} else if r.URL.Path == "/answer/yes" {
-				wd.RespondYes(who, note)
+				wd.RespondYes(name, note)
 				if karaoke == "YES" {
 					http.Redirect(w, r, "/karaoke", 302)
 				}
@@ -65,20 +72,42 @@ func makeInviteListHandler(wd *data.WeddingData, templateName string) func(w htt
 			lastName := r.Form.Get("last_name")
 			log.Println("filtering by", lastName)
 
-			var filteredList []string
-			karaoke := "NO"
+			var filteredList []map[string]string
 			for _, invite := range wd.InviteList {
 				include := strings.Contains(invite["invite"], lastName)
 				if include {
-					filteredList = append(filteredList, invite["invite"])
-					karaoke = invite["karaoke"]
+					filteredList = append(filteredList, invite)
 				}
 			}
 
 			data := make(map[string]interface{})
 			data["FilteredList"] = filteredList
 			data["LastName"] = lastName
-			data["Karaoke"] = karaoke
+
+			//filter invite list and render template
+			views.RenderTemplate(w, templateName, data)
+		} else {
+			http.Redirect(w, r, "/", 302)
+		}
+	}
+}
+
+func makeSongListHandler(wd *data.WeddingData, templateName string) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "POST" {
+			r.ParseForm()
+
+			//these should be
+			name := r.Form.Get("name")
+
+			songList, err := wd.GetKaraokeList()
+			if err != nil {
+				songList = []string{}
+			}
+
+			data := make(map[string]interface{})
+			data["SongList"] = songList
+			data["name"] = name
 
 			//filter invite list and render template
 			views.RenderTemplate(w, templateName, data)
@@ -107,7 +136,7 @@ func main() {
 	views.Init("templates")
 
 	//init data source
-	wd, err := data.NewWeddingData("1F24Fv_JQcUepcEWcPF2BDpESl1HfTbmDRyDE0m02wvI")
+	wd, err := data.NewWeddingData("15tdTnp7u05uSRDlDSOQlFmdK-_8ch4RMFhYi51Ag21U")
 	if err != nil {
 		log.Fatalf("couldn't make connection to data: %v", err)
 	}
@@ -118,6 +147,7 @@ func main() {
 	http.HandleFunc("/", serveTemplate)
 	http.HandleFunc("/no", makeInviteListHandler(wd, "no.html"))
 	http.HandleFunc("/yes", makeInviteListHandler(wd, "yes.html"))
+	http.HandleFunc("/karaoke", makeSongListHandler(wd, "karaoke.html"))
 	http.HandleFunc("/answer/", makeAnswerHandler(wd))
 
 	http.ListenAndServe(*portPtr, loggerMiddleware(http.DefaultServeMux))
